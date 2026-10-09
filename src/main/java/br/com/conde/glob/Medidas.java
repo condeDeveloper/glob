@@ -150,7 +150,7 @@ public final class Medidas {
             String retrocesso;
 
             try {
-                retrocesso = String.format("%,d", new Casadores.PorRetrocesso().passos(p, t));
+                retrocesso = comPontos(new Casadores.PorRetrocesso().passos(p, t));
             } catch (Casadores.ExplodiuException e) {
                 retrocesso = "nao cabe";
             } catch (StackOverflowError e) {
@@ -194,7 +194,7 @@ public final class Medidas {
             String retrocesso;
 
             try {
-                retrocesso = String.format("%,d", new Casadores.PorRetrocesso().passos(p, t));
+                retrocesso = comPontos(new Casadores.PorRetrocesso().passos(p, t));
             } catch (Casadores.ExplodiuException e) {
                 retrocesso = "nao cabe";
             } catch (StackOverflowError e) {
@@ -262,5 +262,29 @@ public final class Medidas {
         }
 
         return linhas;
+    }
+
+    /**
+     * Um numero com PONTO de milhar, sempre, em qualquer maquina.
+     *
+     * <p>O {@code String.format("%,d")} usa o idioma da maquina: aqui sai 2.097.151 e
+     * numa maquina em ingles sai 2,097,151. A integracao continua roda em tres
+     * sistemas e quebrou exatamente nisso, com um teste que comparava a cadeia
+     * formatada.
+     *
+     * <p>Agrupar a mao tira o idioma da conta. Medida nao pode depender de onde esta
+     * rodando.
+     */
+    public static String comPontos(long valor) {
+        String digitos = Long.toString(Math.abs(valor));
+        StringBuilder saida = new StringBuilder();
+
+        for (int i = 0; i < digitos.length(); i++) {
+            if (i > 0 && (digitos.length() - i) % 3 == 0) saida.append('.');
+
+            saida.append(digitos.charAt(i));
+        }
+
+        return (valor < 0 ? "-" : "") + saida;
     }
 }
